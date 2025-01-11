@@ -126,11 +126,11 @@ section.upgrades ul li {
 }
 
 section.upgrades ul li img {
-  border: 3px solid #034078; /* Adding a border to the images */
-  border-radius: 8px; /* Optional: Add some border-radius for rounded corners */
-  width: 150px; /* Adjust the size as needed */
+  border: 3px solid #034078;
+  border-radius: 8px; 
+  width: 150px; 
   height: auto;
-  margin-bottom: 0.5rem; /* Adding some space between the image and the text */
+  margin-bottom: 0.5rem; 
 }
 
 /* Style for reviews list */
