@@ -101,7 +101,7 @@ footer {
 }
 
 button {
-  background-color: #1282A2;
+  background-color: #09c0f3;
   color: #FEFCFB;
   border: none;
   padding: 1rem 2rem;
@@ -111,7 +111,7 @@ button {
 }
 
 button:hover {
-  background-color: #034078;
+  background-color: #1b4468;
 }
 
 /* Style for upgrade images and list items */
