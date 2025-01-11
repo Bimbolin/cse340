@@ -1,6 +1,196 @@
-/******* Change Box Model ***************/
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@1&display=swap');
+ :root {
+     --primary-color: rgb(125, 16, 228);
+     --secondary-coloor: #0A1128; 
+     --accent1-color: #1282A2;
+     --accent2-color: #FEFCFB;
+     --heading-font: DM Serif Display, serif; 
+     --paragraph-font: open sans; 
+     --nav-background-color: #001F54; 
+     --nav-link-color: #FEFCFB;
+     --nav-hover-link-color: #001F54;
+     --nav-hover-background-color: #FEFCFB;
+         }
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+header#top-header {
+  background-color: #034078;
+  color: #FEFCFB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+header#top-header .siteName a {
+  color: #FEFCFB;
+  text-decoration: none;
+  font-size: 2rem;
+}
+
+header#top-header #tools a {
+  color: #FEFCFB;
+  text-decoration: none;
+}
+
+nav {
+  background-color: #0A1128;
+  padding: 1rem;
+  
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7rem;
+  align-items: center;
+  justify-content: space-around;
+}
+
+nav ul li {
+  margin: 0;
+}
+
+nav ul li a {
+  color: #FEFCFB;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+}
+
+nav ul li a:hover {
+  background-color: #1282A2;
+  color: #001F54;
+}
+
+main {
+  padding: 1rem;
+}
+
+section {
+  margin-bottom: 2rem;
+}
+
+section h2 {
+  text-align: left;
+}
+
+section img {
+  max-width: 100%;
+  height: auto;
+}
+
+.featured-car {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+footer {
+  background-color: #0A1128;
+  color: #FEFCFB;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+button {
+  background-color: #1282A2;
+  color: #FEFCFB;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #034078;
+}
+
+/* Style for upgrade images and list items */
+section.upgrades ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+section.upgrades ul li {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+section.upgrades ul li img {
+  border: 3px solid #034078; /* Adding a border to the images */
+  border-radius: 8px; /* Optional: Add some border-radius for rounded corners */
+  width: 150px; /* Adjust the size as needed */
+  height: auto;
+  margin-bottom: 0.5rem; /* Adding some space between the image and the text */
+}
+
+/* Style for reviews list */
+section.reviews ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+section.reviews ul li {
+  margin-bottom: 1rem;
+}
+
+/* Flexbox for content-wrapper to display upgrades and reviews side by side */
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.content-wrapper .upgrades,
+.content-wrapper .reviews {
+  width: 100%;
+}
+
+/* Media Query for Large Screens */
+@media (min-width: 768px) {
+  nav ul {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  section {
+    width: 80%;
+  }
+
+  .featured-car {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .featured-car h2 {
+    margin-right: 1rem;
+  }
+
+  .content-wrapper {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .content-wrapper .upgrades,
+  .content-wrapper .reviews {
+    width: 45%;
+  }
 }
