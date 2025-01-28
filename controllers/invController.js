@@ -1,4 +1,4 @@
-const invModel = require("../models/inventory-model")
+const invModel = require("../models/inv_model")
 const utilities = require("../utilities/")
 
 const invCont = {}
@@ -19,15 +19,17 @@ invCont.buildByClassificationId = async function (req, res, next) {
   })
 }
 
-exports.buildVehicleDetailView = async (req, res) => {
+invCont.buildByInventoryId = async function (req, res) {
   const inventoryId = req.params.inventoryId;
+  let nav = await utilities.getNav()
   try {
     const vehicle = await invModel.getVehicleById(inventoryId);
     if (vehicle) {
-      console.log(vehicle); // Log vehicle data to verify
+     // console.log(vehicle); // Log vehicle data to verify
       res.render("inventory/vehicleDetail", {
         title: `${vehicle.inv_make} ${vehicle.inv_model}`,
-        vehicle: vehicle
+        vehicle: vehicle,
+        nav,
       });
     } else {
       res.status(404).send("Vehicle not found");
@@ -36,8 +38,22 @@ exports.buildVehicleDetailView = async (req, res) => {
     console.error(err);
     res.status(500).send("Server error");
   }
+}
+
+// Controller function to get a specific vehicle by ID
+exports.getVehicleById = async (req, res, next) => {
+  try {
+    const vehicleId = req.params.id;
+    const vehicle = await inventoryModel.getVehicleById(vehicleId);
+    const vehicleHtml = utilities.createVehicleHtml(vehicle);
+    res.render('inventory/vehicleDetail', {
+       vehicleHtml, title: `${vehicle.make} ${vehicle.model}` });
+  } catch (error) {
+    next(error);
+  }
 };
 
 
 
-module.exports = invCont
+
+module.exports =  invCont ;

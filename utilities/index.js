@@ -1,4 +1,4 @@
-const invModel = require("../models/inventory-model")
+const invModel = require("../models/inv_model")
 const Util = {}
 
 /* ************************
@@ -64,17 +64,17 @@ Util.buildClassificationGrid = async function(data){
 const pool = require("../database"); // Remove this if it's already declared elsewhere
 
 // Example utility function
-Util.wrapVehicleInfoInHTML = (vehicle) => {
-  return `
-    <div class="vehicle-details">
-      <img src="${vehicle.fullsize_image}" alt="${vehicle.make} ${vehicle.model}">
-      <h2>${vehicle.make} ${vehicle.model} (${vehicle.year})</h2>
-      <p><strong>Price:</strong> $${vehicle.price.toLocaleString()}</p>
-      <p><strong>Mileage:</strong> ${vehicle.mileage.toLocaleString()} miles</p>
-      <p><strong>Description:</strong> ${vehicle.description}</p>
-    </div>
-  `;
-};
+Util.buildInventoryView = async function (data) {
+  let viewDetail = ""
+          viewDetail += '<ul>'
+          viewDetail += '<li>'
+          viewDetail += '<img scr=" '+ data.inv_image +' "</img>'
+          viewDetail += '<h2> $'+ data.inv_price + '</h2>'
+          viewDetail += '<p>'+ data.inv_description + '</p>'
+          viewDetail += '</li>'
+          viewDetail += '</ul>'
+  return viewDetail        
+}
 
 
 /* ****************************************

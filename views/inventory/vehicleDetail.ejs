@@ -3,35 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title><%= title %></title>
-    <style>
-        /* Add CSS to make the content responsive */
-        .vehicle-details {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .vehicle-details img {
-            max-width: 100%;
-            height: auto;
-        }
-        @media (min-width: 768px) {
-            .vehicle-details {
-                flex-direction: row;
-                gap: 20px;
-            }
-            .vehicle-details img {
-                max-width: 50%;
-            }
-            .vehicle-details div {
-                max-width: 50%;
-            }
-        }
-    </style>
+    
 </head>
 <body>
     <h1><%= title %></h1>
     <div class="vehicle-details">
-        <img src="/<%= vehicle.inv_image %>" alt="<%= vehicle.inv_make %> <%= vehicle.inv_model %>">
+        <img src="<%= vehicle.inv_image %>" alt="<%= vehicle.inv_make %> <%= vehicle.inv_model %>">
         <div>
             <h2><%= vehicle.inv_make %> <%= vehicle.inv_model %> (<%= vehicle.inv_year %>)</h2>
             <p><strong>Price:</strong> $<%= vehicle.inv_price.toLocaleString() %></p>

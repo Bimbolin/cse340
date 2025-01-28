@@ -156,6 +156,73 @@ section.reviews ul li {
   width: 100%;
 }
 
+.login-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    box-sizing: border-box;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #0056b3;
+}
+.flash-message {
+    color: red;
+    text-align: center;
+}
+.register-link {
+    text-align: center;
+    margin-top: 10px;
+}
+.register-link a {
+    color: #007bff;
+    text-decoration: none;
+}
+.register-link a:hover {
+    text-decoration: underline;
+}
+/* Add CSS to make the content responsive */
+.vehicle-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.vehicle-details img {
+  max-width: 100%;
+  height: auto;
+}
+@media (min-width: 768px) {
+  .vehicle-details {
+      flex-direction: row;
+      gap: 20px;
+  }
+  .vehicle-details img {
+      max-width: 50%;
+  }
+  .vehicle-details div {
+      max-width: 50%;
+  }
+}
+
 /* Media Query for Large Screens */
 @media (min-width: 768px) {
   nav ul {
@@ -194,3 +261,4 @@ section.reviews ul li {
     width: 45%;
   }
 }
+
