@@ -14,6 +14,9 @@ const app = express()
 const staticRoute = require("./routes/static")
 const baseController = require("./controllers/baseController")
 const accountRoute = require("./routes/accountRoute"); // Import account route
+const bodyParser = require("body-parser")
+const flash = require("connect-flash");
+
 
 
 // Import inventoryRoute
@@ -40,6 +43,9 @@ app.use(session({
   name: 'sessionId',
 }));
 
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
 // Express Messages Middleware
 app.use(require('connect-flash')())
 app.use(function(req, res, next){
@@ -65,7 +71,7 @@ app.use(staticRoute);
 app.get("/", utilities.handleErrors(baseController.buildHome));
 // Inventory routes
 app.use("/inv", inventoryRoute);
-app.use("/account", accountRoute); // Add account route
+app.use("/account", require("./routes/accountRoute")) // Add account route
 
 const path = require("path");
 const favicon = require("serve-favicon");

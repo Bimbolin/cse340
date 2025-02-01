@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+</head>
+<body>
+    <div class="register-container">
+        <h1><%= title %></h1>
+        <% if (messages && messages.error) { %>
+            <div class="flash-message"><%= messages.error %></div>
+        <% } %>
+        <% if (errors) { %>
+            <ul class="notice">
+           <% errors.array().forEach(error => { %>
+             <li><%= error.msg %></li>
+          <%  }) %>
+           </ul>
+          <% } %>
+        <form action="/account/register" method="POST">
+                <label for="firstname">First Name:</label>
+                <input type="text" name="account_firstname" id="accountFirstname" required value="<%= locals.account_firstname %>">
+                <label for="lastname">Last Name:</label>
+                <input type="text" name="account_lastname" id="accountLastname" required value="<%= locals.account_lastname %>">
+                <label for="email">Email Address:</label>
+                <input type="email" name="account_email" id="accountEmail" required value="<%= locals.account_email %>">
+            <div style="position:relative">
+                <label for="accountPassword">Password:</label> 
+                <span class="password-requirements">Passwords must be at least 12 characters and contain at least 1 number, 1 capital letter and 1 special character</span> 
+                <input type="password" id="accountPassword" name="account_password" placeholder="Password" required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$">
+                <span class="toggle-password" onclick="togglePassword()">👁️</span>
+            </div>
+            <button type="submit">Register</button>
+        </form>
+        <div class="login-link">
+            <p>Already have an account? <a href="/account/login">Login here</a></p>
+        </div>
+    </div> 
+    <script>
+        function togglePassword() {
+            var passwordField = document.getElementById("accountPassword");
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+            } else {
+                passwordField.type = "password";
+            }
+        }
+    </script>
+</body>
+</html>

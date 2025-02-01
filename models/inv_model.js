@@ -1,5 +1,7 @@
-const pool = require("../database")
+const pool = require("../database/");
 const db = require('../database');
+const invModel = {}; // Make sure invModel is properly defined
+
 
 /* ***************************
  *  Get all classification data
@@ -47,4 +49,34 @@ exports.getVehicleById = async (vehicleId) => {
 
 
 
-module.exports = {getClassifications, getInventoryByClassificationId, getVehicleById};
+/* ****************************************
+*  Add New Classification
+* *************************************** */
+invModel.addClassification = async (classification_name) => {
+  try {
+    const sql = "INSERT INTO classification (classification_name) VALUES ($1) RETURNING classification_id";
+    const result = await pool.query(sql, [classification_name]);
+    return result.rows[0].classification_id;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+/* ****************************************
+*  Add New Inventory Item
+* *************************************** */
+invModel.addInventory = async (inventoryData) => {
+  try {
+    const sql = `
+      INSERT INTO inventory (classification_id, inv_make, inv_model, inv_description, inv_price, inv_image, inv_thumbnail, inv_miles, inv_color)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING inv_id`;
+    const params = [inventoryData.classification_id, inventoryData.inv_make, inventoryData.inv_model, inventoryData.inv_description, inventoryData.inv_price, inventoryData.inv_image, inventoryData.inv_thumbnail, inventoryData.inv_miles, inventoryData.inv_color];
+    const result = await pool.query(sql, params);
+    return result.rows[0].inv_id;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+
+module.exports = {getClassifications, getInventoryByClassificationId, getVehicleById,  invModel};

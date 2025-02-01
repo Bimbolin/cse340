@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Classification</title>
+    <script>
+        function validateForm() {
+            const classificationName = document.getElementById('classification_name').value;
+            const regex = /^[a-zA-Z0-9]+$/;
+            if (!regex.test(classificationName)) {
+                alert('Classification name must contain only letters and numbers, and no spaces or special characters.');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <%- include('../partials/header') %>
+    <div class="form-container">
+        <h1>Add New Classification</h1>
+        <% if (messages && messages.error) { %>
+            <div class="flash-message"><%= messages.error %></div>
+        <% } %>
+        <% if (messages && messages.success) { %>
+            <div class="flash-message"><%= messages.success %></div>
+        <% } %>
+        <% if (errors) { %>
+            <ul class="notice">
+                <% errors.forEach(error => { %>
+                    <li><%= error.msg %></li>
+                <% }) %>
+            </ul>
+        <% } %>
+        <form action="/inventory/add-classification" method="POST" onsubmit="return validateForm()">
+            <label for="classification_name">Classification Name:</label>
+            <input type="text" id="classification_name" name="classification_name" required pattern="^[a-zA-Z0-9]+$" value="<%= typeof classification_name !== 'undefined' ? classification_name : '' %>">
+            <small>No spaces or special characters allowed</small>
+            <button type="submit">Add Classification</button>
+        </form>
+    </div>
+</body>
+</html>
+
