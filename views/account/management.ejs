@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Management</title>
+</head>
+<body>
+    <h1>Account Management</h1>
+    <% if (messages && messages.success) { %>
+        <div class="flash-message"><%= messages.success %></div>
+    <% } %>
+    <% if (messages && messages.error) { %>
+        <div class="flash-message"><%= messages.error %></div>
+    <% } %>
+    <% if (errors) { %>
+        <ul class="notice">
+            <% errors.forEach(error => { %>
+                <li><%= error.msg %></li>
+            <% }) %>
+        </ul>
+    <% } %>
+    <p>You're logged in.</p>
+</body>
+</html>

@@ -1,6 +1,8 @@
 const invModel = require("../models/inv_model")
-const pool = require("../database"); // Remove this if it's already declared elsewhere
+const pool = require("../database/index");
 const Util = {}
+const jwt = require("jsonwebtoken")
+require("dotenv").config()
 
 /* ************************
  * Constructs the nav HTML unordered list
@@ -25,8 +27,6 @@ Util.getNav = async function (req, res, next) {
   list += "</ul>"
   return list
 }
-
-module.exports = Util
 
 
 /* **************************************
@@ -76,8 +76,6 @@ Util.buildInventoryView = async function (data) {
   return viewDetail        
 }
 
-
-
 // Function to build classification list
 Util.buildClassificationList = async (classification_id = null) => {
   let data = await invModel.getClassifications();
@@ -94,6 +92,72 @@ Util.buildClassificationList = async (classification_id = null) => {
   classificationList += "</select>";
   return classificationList;
 };
+
+// Function to build the Add Inventory view
+Util.buildAddInventoryView = async function () {
+  let classificationList = await Util.buildClassificationList();
+  let viewAddInv = "";
+  viewAddInv += '<form class="add-inventory-form" action="/inv/add-inventory" method="POST">';
+  viewAddInv += '<label for="classificationList">Choose a classification:</label>';
+  viewAddInv += classificationList;
+  viewAddInv += '<br><br>';
+  viewAddInv += '<label for="inv_make">Make:</label>';
+  viewAddInv += '<input type="text" id="inv_make" name="inv_make" required><br><br>';
+  viewAddInv += '<label for="inv_model">Model:</label>';
+  viewAddInv += '<input type="text" id="inv_model" name="inv_model" required><br><br>';
+  viewAddInv += '<label for="inv_description">Description:</label>';
+  viewAddInv += '<textarea id="inv_description" name="inv_description" required></textarea><br><br>';
+  viewAddInv += '<label for="inv_price">Price:</label>';
+  viewAddInv += '<input type="number" step="0.01" id="inv_price" name="inv_price" required><br><br>';
+  viewAddInv += '<label for="inv_image">Image Path:</label>';
+  viewAddInv += '<input type="text" id="inv_image" name="inv_image" required><br><br>'
+  viewAddInv += '<label for="inv_thumbnail">Thumbnail Path:</label>';
+  viewAddInv += '<input type="text" id="inv_thumbnail" name="inv_thumbnail" required><br><br>';
+  viewAddInv += '<label for="inv_miles">Miles:</label>';
+  viewAddInv += '<input type="number" id="inv_miles" name="inv_miles" required><br><br>';
+  viewAddInv += '<label for="inv_color">Color:</label>';
+  viewAddInv += '<input type="text" id="inv_color" name="inv_color" required><br><br>';
+  viewAddInv += '<button type="submit">Add Inventory</button>';   
+  viewAddInv += '</form>';
+  return viewAddInv;
+};
+
+
+
+/* ****************************************
+* Middleware to check token validity
+**************************************** */
+Util.checkJWTToken = (req, res, next) => {
+  if (req.cookies.jwt) {
+   jwt.verify(
+    req.cookies.jwt,
+    process.env.ACCESS_TOKEN_SECRET,
+    function (err, accountData) {
+     if (err) {
+      req.flash("Please log in")
+      res.clearCookie("jwt")
+      return res.redirect("/account/login")
+     }
+     res.locals.accountData = accountData
+     res.locals.loggedin = 1
+     next()
+    })
+  } else {
+   next()
+  }
+ }
+
+/* ****************************************
+ *  Check Login
+ * ************************************ */
+Util.checkLogin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    next()
+  } else {
+    req.flash("notice", "Please log in.")
+    return res.redirect("/account/login")
+  }
+ }
 
 
 /* ****************************************

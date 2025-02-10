@@ -1,31 +1,40 @@
-const invModel = require("../models/inv_model")
-const Util = require("../utilities/")
+const invModel = require("../models/inv_model");
+const Util = require("../utilities/");
 
-const invController = {}
+const invController = {};
 
 /* ***************************
  *  Build inventory by classification view
  * ************************** */
 invController.buildByClassificationId = async function (req, res, next) {
-  const classification_id = req.params.classificationId
-  const data = await invModel.getInventoryByClassificationId(classification_id)
-  const grid = await Util.buildClassificationGrid(data)
-  let nav = await Util.getNav()
-  const className = data[0].classification_name
-  res.render("./inventory/classification", {
-    title: className + " vehicles",
-    nav,
-    grid,
-  })
-}
+  const classification_id = req.params.classificationId;
+  try {
+    const data = await invModel.getInventoryByClassificationId(classification_id);
+    if (data.length === 0) {
+      req.flash("error", "No inventory items found for this classification.");
+      return res.redirect("/inventory");
+    }
+    const grid = await Util.buildClassificationGrid(data);
+    let nav = await Util.getNav();
+    const className = data[0].classification_name;
+    res.render("./inventory/classification", {
+      title: className + " vehicles",
+      nav,
+      grid,
+    });
+  } catch (error) {
+    console.error(error);
+    req.flash("error", "An error occurred while fetching inventory.");
+    res.redirect("/inventory");
+  }
+};
 
 invController.buildByInventoryId = async function (req, res) {
   const inventoryId = req.params.inventoryId;
-  let nav = await Util.getNav()
+  let nav = await Util.getNav();
   try {
     const vehicle = await invModel.getVehicleById(inventoryId);
     if (vehicle) {
-     // console.log(vehicle); // Log vehicle data to verify
       res.render("inventory/vehicleDetail", {
         title: `${vehicle.inv_make} ${vehicle.inv_model}`,
         vehicle: vehicle,
@@ -38,48 +47,59 @@ invController.buildByInventoryId = async function (req, res) {
     console.error(err);
     res.status(500).send("Server error");
   }
-}
+};
 
 // Controller function to get a specific vehicle by ID
-exports.getVehicleById = async (req, res, next) => {
+invController.getVehicleById = async (req, res, next) => {
   try {
     const vehicleId = req.params.id;
-    const vehicle = await inventoryModel.getVehicleById(vehicleId);
+    const vehicle = await invModel.getVehicleById(vehicleId);
     const vehicleHtml = Util.createVehicleHtml(vehicle);
     res.render('inventory/vehicleDetail', {
-       vehicleHtml, title: `${vehicle.make} ${vehicle.model}` });
+      vehicleHtml, title: `${vehicle.make} ${vehicle.model}`
+    });
   } catch (error) {
     next(error);
   }
 };
 
-
-
 invController.buildManagement = async (req, res) => {
-    let nav = await Util.getNav();
-    res.render('inventory/management', {
-        title: 'Inventory Management',
-        nav,
-    });
+  let nav = await Util.getNav();
+  const classificationSelect = await Util.buildClassificationList()
+  res.render('inventory/management', {
+    title: 'Inventory Management',
+    nav,
+    messages: req.flash('success') || req.flash('error'),
+    classificationSelect,
+  });
 };
 
-
+ invController.buildManagementView = async function (req, res, next){
+  let nav = await Util.getNav()
+  const classificationSelect = await Util.buildClassificationList()
+  res.render("./inventory/management", {
+    title: 'Inventory Management',
+    nav,
+    errors: null,
+    classificationSelect,
+  });
+};
 
 /* ****************************************
-*  Deliver Add Classification View
-* *************************************** */
+ *  Deliver Add Classification View
+ * *************************************** */
 invController.buildAddClassification = async (req, res) => {
   let nav = await Util.getNav();
   res.render("inventory/add-classification", {
     title: "Add Classification",
     nav,
-    errors: null 
+    errors: null
   });
 };
 
 /* ****************************************
-*  Process Add Classification
-* *************************************** */
+ *  Process Add Classification
+ * *************************************** */
 invController.addClassification = async (req, res) => {
   const { classification_name } = req.body;
   try {
@@ -97,37 +117,34 @@ invController.addClassification = async (req, res) => {
       title: "Add Classification",
       nav,
       errors: [{ msg: error.message }], // Pass error messages
-      classification_name: req.body.classification_name,
-    
-    
+      classification_name: req.body.classification_name
     });
   }
 };
 
-
-
 /* ****************************************
-*  Deliver Add Inventory View
-* *************************************** */
+ *  Deliver Add Inventory View
+ * *************************************** */
 invController.buildAddInventory = async (req, res) => {
   let nav = await Util.getNav();
   let classificationList = await Util.buildClassificationList();
+  let viewAddInv = await Util.buildAddInventoryView();
   res.render("inventory/add-inventory", {
     title: "Add Inventory",
     nav,
+    viewAddInv,
+    errors: req.flash('error') || null,
+    messages: req.flash('success') || req.flash('error'),
     classificationList,
     errors: null,
-    messages: req.flash('success') || req.flash('error')
-     
   });
 };
 
 /* ****************************************
-*  Process Add Inventory
-* *************************************** */
+ *  Process Add Inventory
+ * *************************************** */
 invController.addInventory = async (req, res) => {
   const { classification_id, inv_make, inv_model, inv_description, inv_price, inv_image, inv_thumbnail, inv_miles, inv_color } = req.body;
-
   try {
     const result = await invModel.addInventory({ classification_id, inv_make, inv_model, inv_description, inv_price, inv_image, inv_thumbnail, inv_miles, inv_color });
     if (result) {
@@ -150,8 +167,66 @@ invController.addInventory = async (req, res) => {
   }
 };
 
+/* ***************************
+ *  Return Inventory by Classification As JSON
+ * ************************** */
+invController.getInventoryJSON = async (req, res, next) => {
+  const classification_id = parseInt(req.params.classification_id)
+  const invData = await invModel.getInventoryByClassificationId(classification_id)
+  if (invData[0].inv_id) {
+    return res.json(invData)
+  } else {
+    next(new Error("No data returned"))
+  }
+}
+
+/* ****************************************
+ *  Build Edit Inventory View
+ * *************************************** */
+invController.buildEditInventory = async (req, res) => {
+  const inventory_id = req.params.inventory_id;
+  let nav = await utilities.getNav();
+  let inventoryItem = await invModel.getInventoryById(inventory_id);
+  if (!inventoryItem) {
+      req.flash("error", "Inventory item not found.");
+      return res.redirect("/inventory");
+  }
+  res.render("inventory/edit-inventory", {
+      title: `Edit ${inventoryItem.inv_make} ${inventoryItem.inv_model}`,
+      nav,
+      inventoryItem,
+      errors: null,
+      messages: req.flash('success') || req.flash('error')
+  });
+};
 
 
-module.exports =  invController
+/* ***************************
+ *  Build edit inventory view
+ * ************************** */
+invController.editInventoryView = async function (req, res, next) {
+  const inv_id = parseInt(req.params.inv_id)
+  let nav = await utilities.getNav()
+  const itemData = await invModel.getInventoryById(inv_id)
+  const classificationSelect = await utilities.buildClassificationList(itemData.classification_id)
+  const itemName = `${itemData.inv_make} ${itemData.inv_model}`
+  res.render("./inventory/edit-inventory", {
+    title: "Edit " + itemName,
+    nav,
+    classificationSelect: classificationSelect,
+    errors: null,
+    inv_id: itemData.inv_id,
+    inv_make: itemData.inv_make,
+    inv_model: itemData.inv_model,
+    inv_year: itemData.inv_year,
+    inv_description: itemData.inv_description,
+    inv_image: itemData.inv_image,
+    inv_thumbnail: itemData.inv_thumbnail,
+    inv_price: itemData.inv_price,
+    inv_miles: itemData.inv_miles,
+    inv_color: itemData.inv_color,
+    classification_id: itemData.classification_id
+  })
+}
 
-
+module.exports = invController

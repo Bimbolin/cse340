@@ -16,6 +16,7 @@ const baseController = require("./controllers/baseController")
 const accountRoute = require("./routes/accountRoute"); // Import account route
 const bodyParser = require("body-parser")
 const flash = require("connect-flash");
+const cookieParser = require("cookie-parser")
 
 
 
@@ -52,6 +53,10 @@ app.use(function(req, res, next){
   res.locals.messages = require('express-messages')(req, res)
   next()
 });
+
+app.use(cookieParser())
+
+app.use(utilities.checkJWTToken)
 
 
 /* ***********************

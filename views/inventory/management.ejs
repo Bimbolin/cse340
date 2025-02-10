@@ -12,9 +12,20 @@
     <% if (messages && messages.error) { %>
         <div class="flash-message"><%= messages.error %></div>
     <% } %>
+    <form action="/inventory/view-by-classification" method="GET">
+        
+    </form>
     <ul>
         <li><a href="/inv/add-classification">Add New Classification</a></li>
         <li><a href="/inv/add-inventory">Add New Inventory</a></li>
     </ul>
+
+    <h2>Manage Inventory</h2>
+    <p>Choose a classification to see those inventary item</p>
+    <%= classificationSelect %>
+    <table id="inventoryDisplay"></table>
+    <noscript>JavaScript must be enabled to use this page.</noscript>
+
+    <script src="../../js/inventory.js"></script>
 </body>
 </html>
