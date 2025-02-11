@@ -5,7 +5,7 @@ const validate = require("../utilities/account-validation");
 const Util = require("../utilities/");
 
 // Route to deliver the management view
-router.get("/", invController.buildManagement);
+router.get("/",  invController.buildManagement);
 
 // Route to build inventory by classification view
 router.get("/type/:classificationId", invController.buildByClassificationId);
@@ -26,7 +26,7 @@ router.post("/add-classification", validate.classificationRules(), validate.chec
 router.get("/add-inventory", invController.buildAddInventory);
 
 // Route to handle the form submission for inventory
-router.post("/add-inventory", validate.inventoryRules(), validate.checkInventoryData, invController.addInventory);
+router.post("/add-inventory", /*validate.inventoryRules(), validate.checkInventoryData,*/ invController.addInventory);
 
 // Route to display the edit inventory form
 router.get("/edit/:inventory_id", Util.handleErrors(invController.buildEditInventory));

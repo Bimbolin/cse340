@@ -144,23 +144,25 @@ invController.buildAddInventory = async (req, res) => {
  *  Process Add Inventory
  * *************************************** */
 invController.addInventory = async (req, res) => {
-  const { classification_id, inv_make, inv_model, inv_description, inv_price, inv_image, inv_thumbnail, inv_miles, inv_color } = req.body;
+  const { classification_id, inv_make, inv_model, inv_description, inv_price,inv_year, inv_image, inv_thumbnail, inv_miles, inv_color } = req.body;
   try {
-    const result = await invModel.addInventory({ classification_id, inv_make, inv_model, inv_description, inv_price, inv_image, inv_thumbnail, inv_miles, inv_color });
+    const result = await invModel.addInventory({ classification_id, inv_make, inv_model, inv_description, inv_price, inv_year, inv_image, inv_thumbnail, inv_miles, inv_color });
     if (result) {
       req.flash("success", "Inventory item added successfully.");
-      res.redirect("/inventory");
+      res.redirect("/inv");
     } else {
       req.flash("error", "Failed to add inventory item.");
-      res.redirect("/inventory/add-inventory");
+      res.redirect("/inv/add-inventory");
     }
   } catch (error) {
     let nav = await Util.getNav();
     let classificationList = await Util.buildClassificationList(classification_id);
+    let viewAddInv = await Util.buildAddInventoryView();
     res.render("inventory/add-inventory", {
       title: "Add Inventory",
       nav,
       classificationList,
+      viewAddInv,
       errors: [{ msg: error.message }],
       messages: req.flash('success') || req.flash('error')
     });

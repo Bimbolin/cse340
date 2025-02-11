@@ -165,10 +165,12 @@ validate.checkInventoryData = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     let nav = await Util.getNav();
+    let viewAddInv = await Util.buildAddInventoryView();
     let classificationList = await Util.buildClassificationList(req.body.classification_id);
     res.render("inventory/add-inventory", {
       errors: errors.array(),
       title: "Add Inventory",
+      viewAddInv,
       nav,
       classificationList,
       ...req.body

@@ -109,6 +109,8 @@ Util.buildAddInventoryView = async function () {
   viewAddInv += '<textarea id="inv_description" name="inv_description" required></textarea><br><br>';
   viewAddInv += '<label for="inv_price">Price:</label>';
   viewAddInv += '<input type="number" step="0.01" id="inv_price" name="inv_price" required><br><br>';
+  viewAddInv += '<label for"inv_year">Year:</label>';
+  viewAddInv += '<input type="number" id="inv_year" name="inv_year" required><br><br>';
   viewAddInv += '<label for="inv_image">Image Path:</label>';
   viewAddInv += '<input type="text" id="inv_image" name="inv_image" required><br><br>'
   viewAddInv += '<label for="inv_thumbnail">Thumbnail Path:</label>';
