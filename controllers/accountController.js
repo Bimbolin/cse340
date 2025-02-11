@@ -17,6 +17,11 @@ accountController.buildLogin = async (req, res) => {
     errors: req.flash("error")
   })
 }
+
+
+
+
+
 /* ****************************************
 *  Deliver registration view
 * *************************************** */
@@ -87,62 +92,24 @@ try {
   }
 }
 
-/* ****************************************
- *  Process login request
- * ************************************ */
-accountController.accountLogin = async (req, res) =>  {
-  let nav = await utilities.getNav()
-  const { account_email, account_password } = req.body
-  const accountData = await accountModel.getAccountByEmail(account_email)
-  if (!accountData) {
-    req.flash("notice", "Please check your credentials and try again.")
-    res.status(400).render("account/login", {
-      title: "Login",
-      nav,
-      errors: null,
-      account_email,
-    })
-    return
-  }
-  try {
-    if (await bcrypt.compare(account_password, accountData.account_password)) {
-      delete accountData.account_password
-      const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
-      if(process.env.NODE_ENV === 'development') {
-        res.cookie("jwt", accessToken, { httpOnly: true, maxAge: 3600 * 1000 })
-      } else {
-        res.cookie("jwt", accessToken, { httpOnly: true, secure: true, maxAge: 3600 * 1000 })
-      }
-      return res.redirect("/account/")
-    }
-    else {
-      req.flash("message notice", "Please check your credentials and try again.")
-      res.status(400).render("account/login", {
-        title: "Login",
-        nav,
-        errors: null,
-        account_email,
-      })
-    }
-  } catch (error) {
-    throw new Error('Access Forbidden')
-  }
-}
 
-accountController.buildManagement = async (req, res) => {
+/*accountController.buildManagement = async (req, res) => {
   let nav = await utilities.getNav();
+  const user = req.session.user;
+  
   res.render("account/management", {
     title: "Account Management",
     nav,
+    user,
     messages: req.flash('success') || req.flash('error'),
     errors: null
   });
-}
+}*/
 
 /* ****************************************
  *  Process login request
  * ************************************ */
-accountController.accountLogin = async (req, res) =>{
+/*accountController.accountLogin = async (req, res) =>{
   let nav = await utilities.getNav()
   const { account_email, account_password } = req.body
   const accountData = await accountModel.getAccountByEmail(account_email)
@@ -179,10 +146,63 @@ accountController.accountLogin = async (req, res) =>{
   } catch (error) {
     throw new Error('Access Forbidden')
   }
-}
+}*/
 
+accountController.accountLogin = async (req, res) => {
+  let nav = await utilities.getNav();
+  const { account_email, account_password } = req.body;
+  const accountData = await accountModel.getAccountByEmail(account_email);
 
+  if (!accountData) {
+    req.flash("notice", "Please check your credentials and try again.");
+    return res.status(400).render("account/login", {
+      title: "Login",
+      nav,
+      errors: null,
+      account_email,
+    });
+  }
 
+  try {
+    if (await bcrypt.compare(account_password, accountData.account_password)) {
+      delete accountData.account_password;  // Remove password from object
+      req.session.user = accountData;  // ✅ Store user in session
+      req.session.save(() => {  // ✅ Ensure session is saved before redirect
+        return res.redirect("/account/management");
+      });
+    } else {
+      req.flash("notice", "Please check your credentials and try again.");
+      res.status(400).render("account/login", {
+        title: "Login",
+        nav,
+        errors: null,
+        account_email,
+      });
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+    req.flash("error", "Something went wrong. Please try again.");
+    res.redirect("/account/login");
+  }
+};
+
+accountController.buildManagement = async (req, res) => {
+  let nav = await utilities.getNav();
+  const user = req.session.user;
+
+  if (!user) {
+    req.flash("error", "You must be logged in to access this page.");
+    return res.redirect("/account/login");
+  }
+
+  res.render("account/management", {
+    title: "Account Management",
+    nav,
+    user,
+    messages: req.flash("success") || req.flash("error"),
+    errors: null,
+  });
+};
 
 module.exports =  accountController;
 

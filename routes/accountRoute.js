@@ -28,7 +28,7 @@ router.post(
 )
 
 // Default route for account management
-router.get("/", Util.checkLogin, Util.handleErrors(accountController.buildManagement))
+router.get("/", Util.checkLogin, Util.handleErrors(accountController.buildManagement));
 
 
 // Route to display the update account information form
@@ -38,6 +38,35 @@ router.get("/update/:account_id", Util.handleErrors(accountController.buildUpdat
 router.post("/update/:account_id", Util.handleErrors(accountController.updateAccount));
 
 
+// Route to handle logout
+router.get("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Logout Error:", err);
+      req.flash("error", "Logout failed. Please try again.");
+      return res.redirect("/account/management");
+    }
+    res.clearCookie("jwt");  // Remove the JWT cookie
+    res.redirect("/");  // Redirect to homepage after logout
+  });
+});
+
+// Middleware to ensure authentication
+const ensureAuthenticated = (req, res, next) => {
+  if (!req.session.user) {
+    req.flash("notice", "Please log in first.");
+    return res.redirect("/account/login");
+  }
+  next();
+};
+
+// Route for `/account/` → Redirects to account management
+router.get("/", ensureAuthenticated, (req, res) => {
+  res.redirect("/account/management");
+});
+
+// Route for `/account/management`
+router.get("/management", ensureAuthenticated, accountController.buildManagement);
 
 
 module.exports = router;
