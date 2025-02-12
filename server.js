@@ -51,6 +51,7 @@ app.use(utilities.checkJWTToken)
 
 // Middleware to set loggedin state
 app.use((req, res, next) => {
+  res.locals.loggedin = req.session.user ? true : false;  
   res.locals.user = req.session.user || null;
   next();
 });

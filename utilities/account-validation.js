@@ -180,6 +180,23 @@ validate.checkInventoryData = async (req, res, next) => {
   next();
 };
 
+validate.updateAccountRules = () => {
+  return [
+    body('account_firstname').notEmpty().withMessage('First name is required.'),
+    body('account_lastname').notEmpty().withMessage('Last name is required.'),
+    body('account_email').isEmail().withMessage('Valid email is required.')
+  ];
+};
+
+validate.checkUpdateAccountData = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    req.flash('error', errors.array().map(err => err.msg));
+    return res.redirect(`/account/update/${req.body.account_id}`);
+  }
+  next();
+};
+
 
 module.exports = validate; 
 

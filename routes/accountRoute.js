@@ -32,10 +32,25 @@ router.get("/", Util.checkLogin, Util.handleErrors(accountController.buildManage
 
 
 // Route to display the update account information form
-router.get("/update/:account_id", Util.handleErrors(accountController.buildUpdateAccount));
+router.get("/update/:account_id", Util.checkLogin, Util.handleErrors(accountController.buildUpdateAccount));
+// Update Account Information View
+//router.get("/update/:account_id", Util.checkLogin, Util.handleErrors (accountController.updateAccount));
 
 // Route to handle the form submission for updating account information
-router.post("/update/:account_id", Util.handleErrors(accountController.updateAccount));
+router.post(
+  "/update",
+  regValidate.updateAccountRules(),
+  regValidate.checkUpdateAccountData,
+  Util.handleErrors(accountController.updateAccount)
+);
+
+// Route to handle the form submission for changing password
+router.post(
+  "/change-password", 
+  Util.handleErrors(accountController.changePassword)
+);
+
+
 
 
 // Route to handle logout

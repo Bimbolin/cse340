@@ -1,38 +1,28 @@
 const jwt = require("jsonwebtoken");
+const { SECRET } = process.env; // Ensure you have a secret key in your .env file
 
-const checkAdmin = (req, res, next) => {
+const checkAdminOrEmployee = (req, res, next) => {
+  const token = req.cookies.jwt; // Assuming the JWT is stored in a cookie
+
+  if (!token) {
+    req.flash("error", "You must be logged in to view this page.");
+    return res.redirect("/account/login");
+  }
+
   try {
-    // Get JWT from cookies
-    const token = req.cookies.jwt;
-    
-    if (!token) {
-      req.flash("error", "You must be logged in as an Admin or Employee.");
-      return res.redirect("/account/login");
-    }
+    const decoded = jwt.verify(token, SECRET);
 
-    // Verify the token
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-      if (err) {
-        req.flash("error", "Invalid session. Please log in again.");
-        return res.redirect("/account/login");
-      }
-
-      // Check user role
-      if (decoded.account_type !== "Employee" && decoded.account_type !== "Admin") {
-        req.flash("error", "Unauthorized access.");
-        return res.redirect("/account/login");
-      }
-
-      // Pass user info to the request
+    if (decoded.account_type === "Employee" || decoded.account_type === "Admin") {
       req.user = decoded;
       next();
-    });
-
-  } catch (error) {
-    console.error("Auth Middleware Error:", error);
-    req.flash("error", "Authentication failed.");
-    res.redirect("/account/login");
+    } else {
+      req.flash("error", "You do not have the necessary permissions to view this page.");
+      return res.redirect("/account/login");
+    }
+  } catch (err) {
+    req.flash("error", "Invalid token. Please log in again.");
+    return res.redirect("/account/login");
   }
 };
 
-module.exports = checkAdmin;
+module.exports = { checkAdminOrEmployee };

@@ -93,60 +93,7 @@ try {
 }
 
 
-/*accountController.buildManagement = async (req, res) => {
-  let nav = await utilities.getNav();
-  const user = req.session.user;
-  
-  res.render("account/management", {
-    title: "Account Management",
-    nav,
-    user,
-    messages: req.flash('success') || req.flash('error'),
-    errors: null
-  });
-}*/
 
-/* ****************************************
- *  Process login request
- * ************************************ */
-/*accountController.accountLogin = async (req, res) =>{
-  let nav = await utilities.getNav()
-  const { account_email, account_password } = req.body
-  const accountData = await accountModel.getAccountByEmail(account_email)
-  if (!accountData) {
-    req.flash("notice", "Please check your credentials and try again.")
-    res.status(400).render("account/login", {
-      title: "Login",
-      nav,
-      errors: null,
-      account_email,
-    })
-    return
-  }
-  try {
-    if (await bcrypt.compare(account_password, accountData.account_password)) {
-      delete accountData.account_password
-      const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
-      if(process.env.NODE_ENV === 'development') {
-        res.cookie("jwt", accessToken, { httpOnly: true, maxAge: 3600 * 1000 })
-      } else {
-        res.cookie("jwt", accessToken, { httpOnly: true, secure: true, maxAge: 3600 * 1000 })
-      }
-      return res.redirect("/account/")
-    }
-    else {
-      req.flash("message notice", "Please check your credentials and try again.")
-      res.status(400).render("account/login", {
-        title: "Login",
-        nav,
-        errors: null,
-        account_email,
-      })
-    }
-  } catch (error) {
-    throw new Error('Access Forbidden')
-  }
-}*/
 
 accountController.accountLogin = async (req, res) => {
   let nav = await utilities.getNav();
@@ -203,6 +150,69 @@ accountController.buildManagement = async (req, res) => {
     errors: null,
   });
 };
+
+/* ***************************
+ *  Build Update Account View
+ * ************************** */
+accountController.buildUpdateAccount = async (req, res) => {
+  const account_id = req.params.account_id;
+  let nav = await utilities.getNav();
+  const accountData = await accountModel.getAccountById(account_id);
+
+  if (!accountData) {
+    req.flash("error", "Account not found.");
+    return res.redirect("/account");
+  }
+  res.render("account/update-account", {
+    title: `Update Account Information`,
+    nav,
+    user: accountData,
+    errors: null,
+    messages: req.flash('success') || req.flash('error')
+  });
+};
+
+/* ***************************
+ *  Update Account Information
+ * ************************** */
+accountController.updateAccount = async (req, res) => {
+  const { account_firstname, account_lastname, account_email, account_id } = req.body;
+  let nav = await utilities.getNav();
+
+  try {
+    const existingEmailAccount = await accountModel.getAccountByEmail(account_email);
+    if (existingEmailAccount && existingEmailAccount.account_id !== parseInt(account_id)) {
+      req.flash("error", "Email address already in use.");
+      return res.redirect(`/account/update/${account_id}`);
+    }
+
+    await accountModel.updateAccount(account_id, account_firstname, account_lastname, account_email);
+    req.flash("success", "Account information updated successfully.");
+    return res.redirect("/account");
+  } catch (error) {
+    req.flash("error", "Error updating account information.");
+    return res.redirect(`/account/update/${account_id}`);
+  }
+};
+
+/* ***************************
+ *  Change Password
+ * ************************** */
+accountController.changePassword = async (req, res) => {
+  const { new_password, account_id } = req.body;
+  let nav = await utilities.getNav();
+
+  try {
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+    await accountModel.updatePassword(account_id, hashedPassword);
+    req.flash("success", "Password changed successfully.");
+    return res.redirect("/account/management");
+  } catch (error) {
+    req.flash("error", "Error changing password.");
+    return res.redirect(`/account/update/${account_id}`);
+  }
+};
+
 
 module.exports =  accountController;
 
