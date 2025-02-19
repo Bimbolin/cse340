@@ -213,6 +213,34 @@ accountController.changePassword = async (req, res) => {
   }
 };
 
+/* ***************************
+ *  Log User Activity
+ * ************************** */
+accountController.logActivity = async (req, res, next) => {
+  const user_id = req.session.user.account_id;
+  const activity_type = req.body.activity_type;
+  await activityModel.logActivity(user_id, activity_type);
+  next();
+};
+
+/* ***************************
+ *  Build Activity Log View
+ * ************************** */
+accountController.buildActivityLog = async (req, res) => {
+  const user_id = req.session.user.account_id;
+  let nav = await utilities.getNav();
+  const activityLog = await activityModel.getActivityLogByUserId(user_id);
+  res.render("account/activity-log", {
+    title: "User Activity Log",
+    nav,
+    activityLog,
+    user: req.session.user,
+    errors: null,
+    messages: req.flash('success') || req.flash('error')
+  });
+};
+
+
 
 module.exports =  accountController;
 

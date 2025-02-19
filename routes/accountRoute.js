@@ -83,6 +83,16 @@ router.get("/", ensureAuthenticated, (req, res) => {
 // Route for `/account/management`
 router.get("/management", ensureAuthenticated, accountController.buildManagement);
 
+// Route to display the activity log
+router.get("/activity-log", Util.checkLogin, Util.handleErrors(accountController.buildActivityLog));
+
+// Log activities for account updates
+router.post("/update", accountController.logActivity, regValidate.updateAccountRules(), regValidate.checkUpdateAccountData, Util.handleErrors(accountController.updateAccount));
+
+// Log activities for password changes
+router.post("/change-password", accountController.logActivity, Util.handleErrors(accountController.changePassword));
+
+
 
 module.exports = router;
 

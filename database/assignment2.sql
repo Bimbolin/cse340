@@ -21,3 +21,10 @@ UPDATE inventory
 SET inv_image = REPLACE(inv_image, '/images/', '/images/vehicles/'),
     inv_thumbnail = REPLACE(inv_thumbnail, '/images/', '/images/vehicles/');
 
+CREATE TABLE public.user_activity_log (
+  activity_id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,
+  activity_type VARCHAR(50) NOT NULL,
+  activity_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES account(account_id)
+);

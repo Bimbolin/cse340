@@ -87,6 +87,30 @@ const updatePassword = async (account_id, hashedPassword) => {
   }
 };
 
+/* ***************************
+ *  Log User Activity
+ * ************************** */
+const logActivity = async (user_id, activity_type) => {
+  try {
+    await db.none("INSERT INTO user_activity_log (user_id, activity_type) VALUES ($1, $2)", [user_id, activity_type]);
+  } catch (err) {
+    console.error("Error logging activity:", err);
+  }
+};
+
+/* ***************************
+ *  Get User Activity Log
+ * ************************** */
+const getActivityLogByUserId = async (user_id) => {
+  try {
+    const result = await db.any("SELECT * FROM user_activity_log WHERE user_id = $1 ORDER BY activity_timestamp DESC", [user_id]);
+    return result;
+  } catch (err) {
+    console.error("Error fetching activity log:", err);
+    return [];
+  }
+};
 
 
-  module.exports = { registerAccount, checkExistingEmail, getAccountByEmail, getAccountById, updateAccount, updatePassword };
+
+  module.exports = { registerAccount, checkExistingEmail, getAccountByEmail, getAccountById, updateAccount, updatePassword, logActivity, getActivityLogByUserId  };
